@@ -83,16 +83,23 @@ const formatters = {
 
 
 function calculateDelta(tickValue, ticks) {
-  // Figure out how many digits to show
-  // The space between the first two ticks might be smaller than normal spacing
-  let delta = ticks.length > 3 ? ticks[2].value - ticks[1].value : ticks[1].value - ticks[0].value;
-
-  // If we have a number like 2.5 as the delta, figure out how many decimal places we need
-  if (Math.abs(delta) >= 1 && tickValue !== Math.floor(tickValue)) {
-    // not an integer
-    delta = tickValue - Math.floor(tickValue);
+  if (!ticks || ticks.length < 2) {
+    return 0;
   }
-  return delta;
+
+  // Espaço entre os primeiros ticks relevantes
+  const firstIndex = ticks.length > 3 ? 2 : 1;
+  const previousIndex = firstIndex - 1;
+  const baseDelta = ticks[firstIndex].value - ticks[previousIndex].value;
+
+  // Se o delta for maior ou igual a 1 e o tick não for inteiro,
+  // usamos a parte fracionária do próprio tickValue
+  const isInteger = tickValue === Math.floor(tickValue);
+  if (Math.abs(baseDelta) >= 1 && !isInteger) {
+    return tickValue - Math.floor(tickValue);
+  }
+
+  return baseDelta;
 }
 
 /**
